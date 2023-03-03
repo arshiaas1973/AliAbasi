@@ -1,0 +1,14 @@
+        aliabasi [OPTIONS] file
+            OR
+        aliabasi [FILE OPTIONS] [OPTIONS]
+
+        (FILE OPTIONS) =>
+            -s file, --source file        The source file that is going to be compiled.
+            -o file, --output file        The output file that is going to be executed.
+
+        (OPTIONS) =>
+            -h, --help                    Help you to know what are the options and how to run the program.
+                                          You may already know it!!
+            -d, --debug         Show what program gets as variable.
+
+Thats all for now!!

@@ -1,0 +1,5 @@
+#!/bin/bash
+SOURCES="AliAbasi.cpp mylib.cpp lib/sha256.cpp Compilation.cpp Lexer.cpp"
+OPTIONS="-licuuc -licuio"
+g++ $SOURCES $OPTIONS -o aliabasi
+./aliabasi $@
