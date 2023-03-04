@@ -4,6 +4,7 @@
 #include "Compilation.h"
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <cstring>
 #include <vector>
 #include <boost/algorithm/string.hpp>
@@ -20,7 +21,8 @@ Lexer::Lexer(std::string source, std::string output){
     bool look_for_end_loop = false;
     int loop_in_loop_num = 0;
     int current_loop_in = 0;
-    std::vector<std::vector<std::string>> loop_commands;
+    std::vector<int> loop_times;
+    std::vector<std::vector<std::string>> loop_commands = {};
 
     int char_pos = 0;
     int line_num = 0;
@@ -38,10 +40,12 @@ Lexer::Lexer(std::string source, std::string output){
                icu::UnicodeString word( words[i].c_str(), "UTF-8" );
                if(look_for_num_loop){
                     if(mylib::isNumeric(words[i])){
+                        loop_times.insert(loop_times.end(),stoi(words[i]));
                         icu::UnicodeString word_for_begining( words[i+1].c_str(), "UTF-8" );
                         if((i+1)<words.size()){
                             if(word_for_begining.toLower("en_US")=="begin"){
                                 look_for_end_loop = true;
+                                loop_commands.insert(loop_commands.begin(),new std::vector<std::string>());
                             }else{
                                 if(!look_for_end_loop){
                                     std::string msg = "You should put 'BEGIN' after times of repeating (example: 'REPEAT 3 BEGIN ALI END'). line "+std::to_string(line_num)+", word "+std::to_string(i+2)+".";
@@ -61,7 +65,12 @@ Lexer::Lexer(std::string source, std::string output){
                     look_for_num_loop = false;
                }else if(look_for_begin_loop){
                     if(word.toLower("en_US")=="begin"){
+                        // THIS MAY CAUSE PROBLEM OR ERROR
+                        if(look_for_end_loop)
+                            loop_times.insert(loop_times.end(),stoi(words[i+1]));
+
                         look_for_end_loop = true;
+
                     }else{
                         if(!look_for_end_loop){
                             std::string msg = "You should put 'BEGIN' after times of repeating (example: 'REPEAT 3 BEGIN ALI END'). line "+std::to_string(line_num)+", word "+std::to_string(i+2)+".";
@@ -76,10 +85,12 @@ Lexer::Lexer(std::string source, std::string output){
                     if(word.toLower("en_US")=="end"){
 
                     }else if(word.toLower("en_US")=="repeat"){
+
                         loop_in_loop_num++;
                         look_for_begin_loop = true;
+                        current_loop_in++;
                     }else{
-
+                        loop_commands[current_loop_in].insert(loop_commands[current_loop_in].end(),word);
                     }
                }else if(word.toLower("en_US") == "ali"){
                     if (char_pos>0)
@@ -100,6 +111,7 @@ Lexer::Lexer(std::string source, std::string output){
                }else if(word.toLower("en_US").indexOf("repeat")==0){
                     if((i+1)<words.size()){
                         if(mylib::isNumeric(words[i+1])){
+                            loop_times.insert(loop_times.end(),stoi(words[i+1]));
                             icu::UnicodeString word_for_begining( words[i+2].c_str(), "UTF-8" );
                             if((i+2)<words.size()){
                                 if(word_for_begining.toLower("en_US")=="begin"){
@@ -138,6 +150,3 @@ Lexer::Lexer(std::string source, std::string output){
 
     Compilation::Compile(final,output);
 }
-
-
-// Time for uploading it to github cause I need a serious help!!
